@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fuck/pages/image.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -10,13 +11,13 @@ class LandscapeCard extends StatelessWidget {
   final String databasePath;
   final String imgURL;
   final String imgName;
-  final String imgSize;
+  final String imgDimensions;
   final String img;
   const LandscapeCard({
     Key mykey,
     this.imgURL,
     this.imgName,
-    this.imgSize,
+    this.imgDimensions,
     this.img,
     this.databasePath,
   }) : super(key: mykey);
@@ -33,16 +34,21 @@ class LandscapeCard extends StatelessWidget {
       elevation: 1,
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            height: 200,
-            padding: EdgeInsets.all(2),
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: NetworkImage(imgURL), fit: BoxFit.cover),
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all()),
-            // child: Image.asset("assets/testing.png"),
+          InkWell(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageDetails(imageId: imgName.substring(0,imgName.indexOf(".")),) ,),);
+            },
+                      child: Container(
+              width: double.infinity,
+              height: 200,
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: NetworkImage(imgURL), fit: BoxFit.cover),
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all()),
+              // child: Image.asset("assets/testing.png"),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -50,7 +56,7 @@ class LandscapeCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
-                  imgSize,
+                  imgDimensions,
                   style: TextStyle(fontSize: 17),
                 ),
                 Text(
@@ -60,48 +66,7 @@ class LandscapeCard extends StatelessWidget {
                 IconButton(
                   iconSize: 30,
                   icon: Icon(Icons.file_download),
-                  onPressed: () async {
-                    
-                    if(! (await ph.Permission.storage.isGranted)){
-                    ph.Permission.storage.request();}
-                    else {
-                      Fluttertoast.showToast(
-                      msg: "Downloading",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 3,
-                      backgroundColor: Colors.grey,
-                      textColor: Colors.white,
-                      fontSize: 14.0,
-                    );
-                    Directory p = await pp.getExternalStorageDirectory();
-                    p = p.parent.parent.parent.parent;
-                    String dir = p.path + '/Download';
-                    // File f = File(p.path + '/Download/' + imgName);
-                    // f.createSync(recursive: true);
-
-                    try {
-                      await FlutterDownloader.enqueue(
-                        url: img,
-                        savedDir: dir,
-                        fileName: imgName,
-                        showNotification: true,
-                        openFileFromNotification: true,
-                      );
-                      sleep(Duration(seconds: 1));
-                      var database = await openDatabase(databasePath);
-                      await database.transaction((txn) async {
-                        await txn.rawInsert(
-                            'INSERT INTO Downloads(imageName, imagePath) VALUES(?,?)',
-                            [imgName, dir + "/" + imgName]);
-                      });
-                    } catch (e) {
-                      print("fuck");
-                      print(e);
-                      //   f.delete();
-                    }
-                    }
-                  },
+                  onPressed: downloadImage,
                 ),
               ],
             ),
@@ -110,4 +75,47 @@ class LandscapeCard extends StatelessWidget {
       ),
     );
   }
+
+  void downloadImage() async {
+                  
+                  if(! (await ph.Permission.storage.isGranted)){
+                  ph.Permission.storage.request();}
+                  else {
+                    Fluttertoast.showToast(
+                    msg: "Downloading",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 3,
+                    backgroundColor: Colors.grey,
+                    textColor: Colors.white,
+                    fontSize: 14.0,
+                  );
+                  Directory p = await pp.getExternalStorageDirectory();
+                  p = p.parent.parent.parent.parent;
+                  String dir = p.path + '/Download';
+                  // File f = File(p.path + '/Download/' + imgName);
+                  // f.createSync(recursive: true);
+  
+                  try {
+                    await FlutterDownloader.enqueue(
+                      url: img,
+                      savedDir: dir,
+                      fileName: imgName,
+                      showNotification: true,
+                      openFileFromNotification: true,
+                    );
+                    sleep(Duration(seconds: 1));
+                    var database = await openDatabase(databasePath);
+                    await database.transaction((txn) async {
+                      await txn.rawInsert(
+                          'INSERT INTO Downloads(imageName, imagePath) VALUES(?,?)',
+                          [imgName, dir + "/" + imgName]);
+                    });
+                  } catch (e) {
+                    print("fuck");
+                    print(e);
+                    //   f.delete();
+                  }
+                  }
+                }
 }

@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
       flag = true;
     });
     // print(imageURL);
-
+  
     try {
       var res;
       print(flag2);
@@ -223,7 +223,7 @@ class _HomeState extends State<Home> {
                                   padding: EdgeInsets.all(5.0),
                                   child: LandscapeCard(
                                       imgURL: imageURL[index],
-                                      imgSize: imageSize[index],
+                                      imgDimensions: imageSize[index],
                                       imgName: imageName[index],
                                       img: imageForDownload[index],
                                       databasePath: dbPath),
