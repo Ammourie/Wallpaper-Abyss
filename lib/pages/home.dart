@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'downloads_page.dart';
 import 'dart:convert';
+import 'about.dart';
 import 'package:http/http.dart';
 import 'package:sqflite/sqflite.dart';
 import '../wid/landscape_card.dart';
 
 class Home extends StatefulWidget {
-  final Widget card;
-
+  bool tagFlag;
+  final String tagId;
+  final String tagName;
   Home({
     Key key,
-    this.card,
+    this.tagFlag,
+    this.tagId,
+    this.tagName,
   }) : super(key: key);
 
   @override
@@ -18,11 +22,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  var textController = new TextEditingController();
+
   String dbPath;
   GlobalKey<ScaffoldState> mykey = GlobalKey();
   List<Map> imgQuery;
-  bool flag = false;
-  bool flag2 = false;
+  bool searchFlag = false;
+  bool randomFlag = false;
   final String authKey = "070d79a759f80d9a9535411f90c13eee";
   List<String> imageURL = [];
   String userInput = '';
@@ -36,19 +42,24 @@ class _HomeState extends State<Home> {
 
   void fetch() async {
     setState(() {
-      flag = true;
+      searchFlag = true;
     });
-    // print(imageURL);
-  
+    searchURL = widget.tagFlag == true
+        ? "https://wall.alphacoders.com/api2.0/get.php?auth=070d79a759f80d9a9535411f90c13eee&method=tag&id=${widget.tagId}"
+        : searchURL;
     try {
       var res;
-      print(flag2);
-      if (flag2 == false) {
-        print(searchURL + imageRandomPage.toString());
-        res = await get(searchURL + imageRandomPage.toString());
+      print(randomFlag);
+      if (widget.tagFlag == true) {
+        res = await get(searchURL);
       } else {
-        print(searchURL + imageSearchPage.toString());
-        res = await get(searchURL + imageSearchPage.toString());
+        if (randomFlag == false) {
+          print(searchURL + imageRandomPage.toString());
+          res = await get(searchURL + imageRandomPage.toString());
+        } else {
+          print(searchURL + imageSearchPage.toString());
+          res = await get(searchURL + imageSearchPage.toString());
+        }
       }
       var parsed = json.decode(res.body);
       print(parsed);
@@ -59,18 +70,21 @@ class _HomeState extends State<Home> {
         imageName.add(i['id'].toString() + "." + i['file_type'].toString());
         imageForDownload.add(i['url_image']);
       }
-  
     } catch (e) {
       print(e);
     }
     setState(() {
-      flag = false;
+      searchFlag = false;
     });
   }
 
   @override
   void initState() {
     () async {
+      setState(() {
+        textController.text =
+            widget.tagFlag == true ? widget.tagName.toString() : "";
+      });
       var databasesPath = await getDatabasesPath();
       dbPath = databasesPath + "/test.db";
       // await deleteDatabase(dbPath);
@@ -124,15 +138,17 @@ class _HomeState extends State<Home> {
                         height: 60,
                         padding: const EdgeInsets.all(5.0),
                         child: TextField(
+                          controller: textController,
                           onSubmitted: (String value) {
                             setState(() {
-                              flag2 = true;
+                              randomFlag = true;
                               imageForDownload.clear();
                               imageURL.clear();
                               imageName.clear();
                               imageSize.clear();
-                              userInput = '';
                               imageSearchPage = 1;
+                              widget.tagFlag = false;
+                              textController.text = value;
                               userInput = value.replaceAll(" ", "+");
                               searchURL =
                                   "https://wall.alphacoders.com/api2.0/get.php?auth=070d79a759f80d9a9535411f90c13eee&method=search&term=" +
@@ -165,8 +181,10 @@ class _HomeState extends State<Home> {
             ),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(color: Color(0x8066b3ff)),
-                child: (flag == true && imageURL.length == 0)
+                decoration: BoxDecoration(
+                  color: Color(0x8066b3ff),
+                ),
+                child: (searchFlag == true && imageURL.length == 0)
                     ? Container(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Center(child: CircularProgressIndicator()),
@@ -179,7 +197,7 @@ class _HomeState extends State<Home> {
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    flag == true
+                                    searchFlag == true
                                         ? Center(
                                             child: CircularProgressIndicator(),
                                           )
@@ -199,7 +217,7 @@ class _HomeState extends State<Home> {
                                               ),
                                             ),
                                             onPressed: () {
-                                              if (flag2 == false) {
+                                              if (randomFlag == false) {
                                                 setState(() {
                                                   imageRandomPage =
                                                       imageRandomPage + 1;
@@ -287,6 +305,26 @@ class _HomeState extends State<Home> {
               ),
               leading: Icon(
                 Icons.file_download,
+                size: 30,
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AboutPage(),
+                  ),
+                );
+              },
+              title: Text(
+                "about",
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              leading: Icon(
+                Icons.info_outline,
                 size: 30,
               ),
             ),

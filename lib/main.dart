@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'wid/landscape_card.dart';
 import 'package:flutter/services.dart';
 import 'pages/home.dart';
 // import 'package:workmanager/workmanager.dart';
-
 
 main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +27,8 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           primaryColor: Colors.blue[800],
         ),
-        home: Home(card: LandscapeCard()));
+        home: Home(
+          tagFlag: false,
+        ));
   }
 }

@@ -19,7 +19,8 @@ class DownloadsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xef004d99),
-          title: Center(child: Text("Downloads")),
+          title: Text("Downloads"),
+          centerTitle: true,
         ),
         body: Container(
           color: Color(0x8066b3ff),
