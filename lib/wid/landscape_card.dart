@@ -24,28 +24,28 @@ class LandscapeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(25),
-          bottom: Radius.circular(15),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ImageDetails(
+              imageId: imgName.substring(0, imgName.indexOf(".")),
+            ),
+          ),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(25),
+            bottom: Radius.circular(15),
+          ),
         ),
-      ),
-      elevation: 1,
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ImageDetails(
-                    imageId: imgName.substring(0, imgName.indexOf(".")),
-                  ),
-                ),
-              );
-            },
-            child: Container(
+        elevation: 1,
+        child: Column(
+          children: [
+            Container(
               width: double.infinity,
               height: 200,
               padding: EdgeInsets.all(2),
@@ -56,29 +56,29 @@ class LandscapeCard extends StatelessWidget {
                   border: Border.all()),
               // child: Image.asset("assets/testing.png"),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  imgDimensions,
-                  style: TextStyle(fontSize: 17),
-                ),
-                Text(
-                  imgName,
-                  style: TextStyle(fontSize: 17),
-                ),
-                IconButton(
-                  iconSize: 30,
-                  icon: Icon(Icons.file_download),
-                  onPressed: downloadImage,
-                ),
-              ],
-            ),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    imgDimensions,
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  Text(
+                    imgName,
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  IconButton(
+                    iconSize: 30,
+                    icon: Icon(Icons.file_download),
+                    onPressed: downloadImage,
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -103,14 +103,14 @@ class LandscapeCard extends StatelessWidget {
       // f.createSync(recursive: true);
 
       try {
-        await FlutterDownloader.enqueue(
+        var download_id = await FlutterDownloader.enqueue(
           url: img,
           savedDir: dir,
           fileName: imgName,
           showNotification: true,
           openFileFromNotification: true,
         );
-        sleep(Duration(seconds: 1));
+
         var database = await openDatabase(databasePath);
         await database.transaction((txn) async {
           await txn.rawInsert(

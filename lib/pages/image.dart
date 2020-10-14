@@ -202,7 +202,11 @@ class ImageDetails extends StatelessWidget {
               color: Color(0xE1FCC4D0),
             ),
             child: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(
+                  Color(0xE1FF2B59),
+                ),
+              ),
             ),
           );
         },

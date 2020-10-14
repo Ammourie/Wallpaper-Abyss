@@ -210,15 +210,20 @@ class _HomeState extends State<Home> {
                                     children: [
                                       searchFlag == true
                                           ? Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                                              child: CircularProgressIndicator(
+                                                valueColor:
+                                                    new AlwaysStoppedAnimation<
+                                                        Color>(
+                                                  Color(0xE1FF2B59),
+                                                ),
+                                              ),
                                             )
                                           : FlatButton(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(18.0),
                                               ),
-                                              color: Color(0xef004d99),
+                                              color: Color(0xE1FF2B59),
                                               child: Padding(
                                                 padding: EdgeInsets.all(10.0),
                                                 child: Text(
