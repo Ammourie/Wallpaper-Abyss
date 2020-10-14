@@ -18,12 +18,12 @@ class DownloadsPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xef004d99),
+          backgroundColor: Color(0xEFFF0239),
           title: Text("Downloads"),
           centerTitle: true,
         ),
         body: Container(
-          color: Color(0x8066b3ff),
+          color: Color(0xE1FCC4D0),
           child: downloadedImages.length == 0
               ? Center(
                   child: Column(

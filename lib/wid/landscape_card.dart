@@ -35,10 +35,17 @@ class LandscapeCard extends StatelessWidget {
       child: Column(
         children: [
           InkWell(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageDetails(imageId: imgName.substring(0,imgName.indexOf(".")),) ,),);
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ImageDetails(
+                    imageId: imgName.substring(0, imgName.indexOf(".")),
+                  ),
+                ),
+              );
             },
-                      child: Container(
+            child: Container(
               width: double.infinity,
               height: 200,
               padding: EdgeInsets.all(2),
@@ -77,45 +84,44 @@ class LandscapeCard extends StatelessWidget {
   }
 
   void downloadImage() async {
-                  
-                  if(! (await ph.Permission.storage.isGranted)){
-                  ph.Permission.storage.request();}
-                  else {
-                    Fluttertoast.showToast(
-                    msg: "Downloading",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.grey,
-                    textColor: Colors.white,
-                    fontSize: 14.0,
-                  );
-                  Directory p = await pp.getExternalStorageDirectory();
-                  p = p.parent.parent.parent.parent;
-                  String dir = p.path + '/Download';
-                  // File f = File(p.path + '/Download/' + imgName);
-                  // f.createSync(recursive: true);
-  
-                  try {
-                    await FlutterDownloader.enqueue(
-                      url: img,
-                      savedDir: dir,
-                      fileName: imgName,
-                      showNotification: true,
-                      openFileFromNotification: true,
-                    );
-                    sleep(Duration(seconds: 1));
-                    var database = await openDatabase(databasePath);
-                    await database.transaction((txn) async {
-                      await txn.rawInsert(
-                          'INSERT INTO Downloads(imageName, imagePath) VALUES(?,?)',
-                          [imgName, dir + "/" + imgName]);
-                    });
-                  } catch (e) {
-                    print("fuck");
-                    print(e);
-                    //   f.delete();
-                  }
-                  }
-                }
+    if (!(await ph.Permission.storage.isGranted)) {
+      ph.Permission.storage.request();
+    } else {
+      Fluttertoast.showToast(
+        msg: "Downloading",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Color(0x9AF5ADBC),
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+      Directory p = await pp.getExternalStorageDirectory();
+      p = p.parent.parent.parent.parent;
+      String dir = p.path + '/Download';
+      // File f = File(p.path + '/Download/' + imgName);
+      // f.createSync(recursive: true);
+
+      try {
+        await FlutterDownloader.enqueue(
+          url: img,
+          savedDir: dir,
+          fileName: imgName,
+          showNotification: true,
+          openFileFromNotification: true,
+        );
+        sleep(Duration(seconds: 1));
+        var database = await openDatabase(databasePath);
+        await database.transaction((txn) async {
+          await txn.rawInsert(
+              'INSERT INTO Downloads(imageName, imagePath) VALUES(?,?)',
+              [imgName, dir + "/" + imgName]);
+        });
+      } catch (e) {
+        print("fuck");
+        print(e);
+        //   f.delete();
+      }
+    }
+  }
 }

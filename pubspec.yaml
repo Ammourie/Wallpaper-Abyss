@@ -39,7 +39,7 @@ dependencies:
   flutter_cache_manager: ^1.4.2
   flutter_launcher_icons: "^0.8.0"
   flutter_tags: "^0.4.9"
-  # workmanager: ^0.2.3
+  url_launcher: ^5.7.2
 
 
 
