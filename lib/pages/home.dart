@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fuck/pages/settings.dart';
 import 'downloads_page.dart';
 import 'dart:convert';
 import 'about.dart';
@@ -94,7 +95,7 @@ class _HomeState extends State<Home> {
           onCreate: (Database db, int version) async {
         // When creating the db, create the table
         await db.execute(
-            'CREATE TABLE Downloads (imageName TEXT PRIMARY KEY, imagePath TEXT)');
+            'CREATE TABLE Downloads (imageName TEXT PRIMARY KEY, imagePath TEXT,thumbnailPath TEXT)');
       });
     }();
     fetch();
@@ -104,18 +105,18 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).canvasColor,
       key: mykey,
       drawer: buildDrawer(context),
       body: SafeArea(
         child: Container(
-          color: Color(0xE1FCC4D0),
           child: Column(
             children: [
               Column(
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(0xEFFF0239),
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.only(
                         bottomRight: Radius.elliptical(80, 20),
                         bottomLeft: Radius.elliptical(80, 20),
@@ -192,13 +193,14 @@ class _HomeState extends State<Home> {
               ),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                      // color: Color(0x65FF9E9E),
-                      ),
                   child: (searchFlag == true && imageURL.length == 0)
                       ? Container(
                           padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).primaryColor)),
+                          ),
                         )
                       : ListView.builder(
                           // itemExtent: 250.0,
@@ -213,9 +215,9 @@ class _HomeState extends State<Home> {
                                               child: CircularProgressIndicator(
                                                 valueColor:
                                                     new AlwaysStoppedAnimation<
-                                                        Color>(
-                                                  Color(0xE1FF2B59),
-                                                ),
+                                                            Color>(
+                                                        Theme.of(context)
+                                                            .primaryColor),
                                               ),
                                             )
                                           : FlatButton(
@@ -223,7 +225,8 @@ class _HomeState extends State<Home> {
                                                 borderRadius:
                                                     BorderRadius.circular(18.0),
                                               ),
-                                              color: Color(0xE1FF2B59),
+                                              color:
+                                                  Theme.of(context).buttonColor,
                                               child: Padding(
                                                 padding: EdgeInsets.all(10.0),
                                                 child: Text(
@@ -284,30 +287,13 @@ class _HomeState extends State<Home> {
 
   Drawer buildDrawer(BuildContext context) {
     return Drawer(
-      child: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Color(0xE1FCC4D0),
-          ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Wallpaper Abyss"),
+        ),
+        body: Container(
           child: Column(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0xEFFF0239),
-                ),
-                child: ListTile(
-                  title: AppTitle(),
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      mykey.currentState.openEndDrawer();
-                    },
-                  ),
-                ),
-              ),
               ListTile(
                 onTap: () async {
                   Database database = await openDatabase(dbPath);
@@ -336,6 +322,23 @@ class _HomeState extends State<Home> {
                 leading: Icon(
                   Icons.download_outlined,
                   size: 35,
+                ),
+              ),
+              ListTile(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SettingsPage(),
+                    )),
+                title: Text(
+                  "settings",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                leading: Icon(
+                  Icons.settings,
+                  size: 36,
                 ),
               ),
               ListTile(

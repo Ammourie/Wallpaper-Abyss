@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as pp;
 import 'package:sqflite/sqflite.dart';
 // import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
@@ -18,12 +18,10 @@ class DownloadsPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xEFFF0239),
           title: Text("Downloads"),
           centerTitle: true,
         ),
         body: Container(
-          color: Color(0xE1FCC4D0),
           child: downloadedImages.length == 0
               ? Center(
                   child: Column(
@@ -47,14 +45,17 @@ class DownloadsPage extends StatelessWidget {
                         //     await getApplicationDocumentsDirectory();
                         // f.rename(tmp.path);
                         f.delete();
-                        var appDir = (await getTemporaryDirectory()).path;
-                        new Directory(appDir).delete(recursive: true);
+                        var tmpDir = (await pp.getTemporaryDirectory()).path;
+                        new Directory(tmpDir).delete(recursive: true);
+                        var appDir = await pp.getExternalStorageDirectory();
                         // DefaultCacheManager dcm = new DefaultCacheManager();
                         // dcm.emptyCache();
                         Database db = await openDatabase(databasePath);
                         await db.rawDelete(
-                            "DELETE FROM Downloads WHERE imageName = ?",
-                            [downloadedImages[index]["imageName"]]);
+                            "DELETE FROM Downloads WHERE imageName = ?", [
+                          downloadedImages[downloadedImages.length - 1 - index]
+                              ["imageName"]
+                        ]);
                         db.close();
                       },
                       background: Container(
@@ -70,11 +71,33 @@ class DownloadsPage extends StatelessWidget {
                           print("long fuck");
                         },
                         onTap: () {
-                          OpenFile.open(downloadedImages[index]["imagePath"]);
+                          OpenFile.open("/storage/" +
+                              downloadedImages[downloadedImages.length -
+                                  1 -
+                                  index]["imagePath"]);
                         },
                         child: ListTile(
-                          title: Text(downloadedImages[index]["imageName"]),
-                          subtitle: Text(downloadedImages[index]["imagePath"]),
+                          title: Text(downloadedImages[downloadedImages.length -
+                              1 -
+                              index]["imageName"]),
+                          leading: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: FileImage(
+                                File(
+                                  downloadedImages[downloadedImages.length -
+                                      1 -
+                                      index]["thumbnailPath"],
+                                ),
+                              ),
+                            )),
+                          ),
+                          subtitle: Text(downloadedImages[
+                                  downloadedImages.length - 1 - index]
+                              ["imagePath"]),
                         ),
                       ),
                     );

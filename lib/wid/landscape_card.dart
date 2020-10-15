@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:fuck/notifires/settings_notifire.dart';
 import 'package:fuck/pages/image.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -42,7 +44,7 @@ class LandscapeCard extends StatelessWidget {
             bottom: Radius.circular(15),
           ),
         ),
-        elevation: 1,
+        elevation: 5,
         child: Column(
           children: [
             Container(
@@ -69,10 +71,16 @@ class LandscapeCard extends StatelessWidget {
                     imgName,
                     style: TextStyle(fontSize: 17),
                   ),
-                  IconButton(
-                    iconSize: 30,
-                    icon: Icon(Icons.file_download),
-                    onPressed: downloadImage,
+                  Consumer<SettingsNotifire>(
+                    builder: (ctx, notifire, _) {
+                      var storageLocation = notifire.storageLocation;
+                      return IconButton(
+                        iconSize: 30,
+                        icon: Icon(Icons.file_download),
+                        onPressed: () =>
+                            downloadImage(storageLocation, context),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -83,7 +91,7 @@ class LandscapeCard extends StatelessWidget {
     );
   }
 
-  void downloadImage() async {
+  void downloadImage(bool storageLocation, BuildContext context) async {
     if (!(await ph.Permission.storage.isGranted)) {
       ph.Permission.storage.request();
     } else {
@@ -92,20 +100,39 @@ class LandscapeCard extends StatelessWidget {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 3,
-        backgroundColor: Color(0x9AF5ADBC),
+        backgroundColor: Theme.of(context).accentColor,
         textColor: Colors.white,
         fontSize: 14.0,
       );
-      Directory p = await pp.getExternalStorageDirectory();
-      p = p.parent.parent.parent.parent;
-      String dir = p.path + '/Download';
+      var p = await pp.getExternalStorageDirectories();
+      String appdir = p[0].path;
+
+      String dir = "";
+      if (p.length > 1) {
+        if (!storageLocation) {
+          dir = p[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
+        } else {
+          dir = p[1].parent.parent.parent.parent.path + '/Wallpaper Abyss';
+        }
+      } else {
+        dir = p[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
+      }
       // File f = File(p.path + '/Download/' + imgName);
       // f.createSync(recursive: true);
+      Directory finalDir = Directory(dir);
+      finalDir.createSync(recursive: true);
 
       try {
-        var download_id = await FlutterDownloader.enqueue(
+        await FlutterDownloader.enqueue(
+          url: imgURL,
+          savedDir: appdir,
+          fileName: imgName,
+          showNotification: false,
+          openFileFromNotification: false,
+        );
+        await FlutterDownloader.enqueue(
           url: img,
-          savedDir: dir,
+          savedDir: finalDir.path,
           fileName: imgName,
           showNotification: true,
           openFileFromNotification: true,
@@ -114,11 +141,14 @@ class LandscapeCard extends StatelessWidget {
         var database = await openDatabase(databasePath);
         await database.transaction((txn) async {
           await txn.rawInsert(
-              'INSERT INTO Downloads(imageName, imagePath) VALUES(?,?)',
-              [imgName, dir + "/" + imgName]);
+              'INSERT INTO Downloads(imageName, imagePath,thumbnailPath) VALUES(?,?,?)',
+              [
+                imgName,
+                finalDir.path.substring(9) + "/" + imgName,
+                "$appdir/$imgName"
+              ]);
         });
       } catch (e) {
-        print("fuck");
         print(e);
         //   f.delete();
       }
