@@ -1,0 +1,54 @@
+[33mcommit 9ba07448013009257042ddb775951912501cdd9c[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Thu Oct 15 13:06:20 2020 +0300
+
+    new settings created
+
+[33mcommit ae5eac3cd5f7ecafec19ca62f95217f651020d9b[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Wed Oct 14 19:25:38 2020 +0300
+
+    new style have applied
+
+[33mcommit 0ea471a24fc4cab46d8aab5aa13118427929e0ab[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Wed Oct 14 04:06:09 2020 +0300
+
+    changing styles
+
+[33mcommit 62f957b757d5242fbcf349b1bc87367db3df7768[m
+Merge: 617e014 5fd1ebe
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Tue Oct 13 02:21:45 2020 +0300
+
+    Merge branch 'main' of https://github.com/Ammourie/Wallpaper-Abyss into main
+
+[33mcommit 617e014a875f1004a8b7b9bd69d2f240b8d67611[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Tue Oct 13 02:17:45 2020 +0300
+
+    about created
+
+[33mcommit b949c60e46190675f2dcd02418359c767524fc17[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Thu Oct 8 23:03:51 2020 +0300
+
+    new commit
+
+[33mcommit f207607713dd1fac5bb865c1405ecb5c9a1ef4c0[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Wed Oct 7 22:42:13 2020 +0300
+
+    image page created
+
+[33mcommit 5fd1ebe11717f492542072ec3d23c55514ca5ca2[m
+Author: Mohammed <59035839+Ammourie@users.noreply.github.com>
+Date:   Tue Oct 6 16:15:18 2020 +0300
+
+    Update README.md
+
+[33mcommit aef1dd75ef8cc2be56698a08bbac67062250d40d[m
+Author: Mohammed Ammourie <mohammed.amory.it@gmail.com>
+Date:   Tue Oct 6 16:10:47 2020 +0300
+
+    first time with git

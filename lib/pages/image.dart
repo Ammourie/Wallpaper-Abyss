@@ -9,6 +9,7 @@ import 'package:fuck/pages/home.dart';
 import 'package:fuck/pages/image_future.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
+import '../mapp.dart';
 import '../models/image_info.dart' as pi;
 import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:path_provider/path_provider.dart' as pp;
@@ -133,66 +134,38 @@ class ImageDetails extends StatelessWidget {
                                 textColor: Colors.white,
                                 fontSize: 14.0,
                               );
-                              List<Directory> p =
-                                  await pp.getExternalStorageDirectories();
-                              String appDir = p[0].path;
-                              String dir = "";
-                              if (p.length > 1) {
-                                if (!notifire.storageLocation) {
-                                  dir = p[0].parent.parent.parent.parent.path +
-                                      '/Wallpaper Abyss';
-                                } else {
-                                  dir = p[1].parent.parent.parent.parent.path +
-                                      '/Wallpaper Abyss';
-                                }
-                              } else {
-                                dir = p[0].parent.parent.parent.parent.path +
-                                    '/Wallpaper Abyss';
-                              }
-                              Directory finalDir = Directory(dir);
-                              finalDir.createSync(recursive: true);
+                              var p = await pp.getExternalStorageDirectories();
+
+                              String thumbTmp = "";
+                              thumbTmp = p[0].parent.path + "/thumbnails";
+                              String tmp = "";
+                              tmp = p[0].path;
+                              Directory thumbDir = Directory(thumbTmp);
+                              thumbDir.createSync(recursive: true);
+                              Directory tmpDir = Directory(tmp);
+                              tmpDir.createSync(recursive: true);
+                              print(snapshot.data.imageId);
                               try {
+                                print(snapshot.data.imageName);
                                 await FlutterDownloader.enqueue(
                                   url: snapshot.data.thumbURL,
-                                  savedDir: appDir,
-                                  fileName: snapshot.data.imageId +
-                                      "." +
-                                      snapshot.data.imgType,
+                                  savedDir: thumbDir.path,
+                                  fileName: snapshot.data.imageId,
                                   showNotification: false,
                                   openFileFromNotification: false,
                                 );
-                                await FlutterDownloader.enqueue(
+                                String taskId = await FlutterDownloader.enqueue(
                                   url: snapshot.data.imgURL,
-                                  savedDir: finalDir.path,
+                                  savedDir: tmpDir.path.toString(),
                                   fileName: snapshot.data.imageId +
                                       "." +
                                       snapshot.data.imgType,
                                   showNotification: true,
                                   openFileFromNotification: true,
                                 );
-                                var databasesPath = await getDatabasesPath();
-                                var dbPath = databasesPath + "/test.db";
-                                sleep(Duration(seconds: 1));
-                                var database = await openDatabase(dbPath);
-                                await database.transaction((txn) async {
-                                  await txn.rawInsert(
-                                      'INSERT INTO Downloads(imageName, imagePath,thumbnailPath) VALUES(?,?,?)',
-                                      [
-                                        snapshot.data.imageId +
-                                            "." +
-                                            snapshot.data.imgType,
-                                        finalDir.path.substring(9) +
-                                            "/" +
-                                            snapshot.data.imageId +
-                                            "." +
-                                            snapshot.data.imgType,
-                                        "$appDir/${snapshot.data.imageId + "." + snapshot.data.imgType}"
-                                      ]);
-                                });
+                                ext.add(taskId);
                               } catch (e) {
-                                print("fuck");
                                 print(e);
-                                //   f.delete();
                               }
                             }
                           },

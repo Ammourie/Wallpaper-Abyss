@@ -1,8 +1,13 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/services.dart';
+import 'package:fuck/mapp.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 import './notifires/settings_notifire.dart';
 import 'package:provider/provider.dart';
 import 'pages/home.dart';
@@ -21,7 +26,22 @@ main(List<String> args) async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ReceivePort _port = ReceivePort();
+
+  @override
+  void initState() {
+    _bindBackgroundIsolate();
+
+    FlutterDownloader.registerCallback(downloadCallback);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -43,5 +63,75 @@ class MyApp extends StatelessWidget {
         );
       }),
     );
+  }
+
+  void _bindBackgroundIsolate() {
+    bool isSuccess = IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    if (!isSuccess) {
+      _unbindBackgroundIsolate();
+      _bindBackgroundIsolate();
+      return;
+    }
+    _port.listen((dynamic data) async {
+      String id = data[0];
+      DownloadTaskStatus status = data[1];
+      int progress = data[2];
+      if (status == DownloadTaskStatus.complete && ext.contains(id)) {
+        print("problem");
+        var res = await FlutterDownloader.loadTasksWithRawQuery(
+            query: "select * from task where task_id='$id'");
+        var task = res[0];
+        SharedPreferences sp = await SharedPreferences.getInstance();
+        bool storageflag = sp.getBool("storageLocation");
+        String finalDir;
+        var t = await pp.getExternalStorageDirectories();
+
+        String thumbDir = t[0].parent.path + "/thumbnails";
+        if (!storageflag) {
+          finalDir = t[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
+        } else {
+          finalDir = t[1].path + '/Wallpaper Abyss';
+        }
+        print(task.savedDir);
+        File src = File(task.savedDir + "/${task.filename}");
+        src.createSync(recursive: true);
+        File des = File(finalDir + "/${task.filename}");
+        await des.create(recursive: true);
+        var data = await src.readAsBytes();
+        await des.writeAsBytes(data);
+        await src.delete();
+        var databasesPath = await getDatabasesPath();
+        String dbPath = databasesPath + "/test.db";
+        var database = await openDatabase(dbPath);
+        await database.transaction((txn) async {
+          await txn.rawInsert(
+              'INSERT INTO Downloads(imageName, imagePath,thumbnailPath) VALUES(?,?,?)',
+              [
+                task.filename,
+                finalDir.substring(9) + "/" + task.filename,
+                "$thumbDir/${task.filename.split(".")[0]}"
+              ]);
+        });
+        ext.remove(id);
+      }
+    });
+  }
+
+  void _unbindBackgroundIsolate() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+  }
+
+  static void downloadCallback(
+      String id, DownloadTaskStatus status, int progress) {
+    final SendPort send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
+    send.send([id, status, progress]);
+  }
+
+  @override
+  void dispose() {
+    _unbindBackgroundIsolate();
+    super.dispose();
   }
 }

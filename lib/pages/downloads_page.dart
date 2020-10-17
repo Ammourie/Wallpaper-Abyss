@@ -40,16 +40,13 @@ class DownloadsPage extends StatelessWidget {
                     return Dismissible(
                       key: Key(index.toString()),
                       onDismissed: (direction) async {
-                        File f = File(downloadedImages[index]["imagePath"]);
-                        // Directory tmp =
-                        //     await getApplicationDocumentsDirectory();
-                        // f.rename(tmp.path);
+                        File f = File(
+                            "/storage/" + downloadedImages[index]["imagePath"]);
+
                         f.delete();
                         var tmpDir = (await pp.getTemporaryDirectory()).path;
                         new Directory(tmpDir).delete(recursive: true);
-                        var appDir = await pp.getExternalStorageDirectory();
-                        // DefaultCacheManager dcm = new DefaultCacheManager();
-                        // dcm.emptyCache();
+
                         Database db = await openDatabase(databasePath);
                         await db.rawDelete(
                             "DELETE FROM Downloads WHERE imageName = ?", [

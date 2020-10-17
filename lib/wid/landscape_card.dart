@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fuck/mapp.dart';
 import 'package:fuck/notifires/settings_notifire.dart';
 import 'package:fuck/pages/image.dart';
 import 'package:provider/provider.dart';
@@ -105,52 +106,35 @@ class LandscapeCard extends StatelessWidget {
         fontSize: 14.0,
       );
       var p = await pp.getExternalStorageDirectories();
-      String appdir = p[0].path;
 
-      String dir = "";
-      if (p.length > 1) {
-        if (!storageLocation) {
-          dir = p[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
-        } else {
-          dir = p[1].parent.parent.parent.parent.path + '/Wallpaper Abyss';
-        }
-      } else {
-        dir = p[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
-      }
-      // File f = File(p.path + '/Download/' + imgName);
-      // f.createSync(recursive: true);
-      Directory finalDir = Directory(dir);
-      finalDir.createSync(recursive: true);
+      String thumbTmp = "";
+      thumbTmp = p[0].parent.path + "/thumbnails";
+      Directory thumbDir = Directory(thumbTmp);
+      thumbDir.createSync(recursive: true);
+      String tmp = "";
+      tmp = p[0].path;
+      Directory tmpDir = Directory(tmp);
+      tmpDir.createSync(recursive: true);
+      String thumbName = imgName.split(".")[0];
 
       try {
         await FlutterDownloader.enqueue(
           url: imgURL,
-          savedDir: appdir,
-          fileName: imgName,
+          savedDir: thumbDir.path,
+          fileName: thumbName,
           showNotification: false,
           openFileFromNotification: false,
         );
-        await FlutterDownloader.enqueue(
+        String taskId = await FlutterDownloader.enqueue(
           url: img,
-          savedDir: finalDir.path,
+          savedDir: tmpDir.path,
           fileName: imgName,
           showNotification: true,
           openFileFromNotification: true,
         );
-
-        var database = await openDatabase(databasePath);
-        await database.transaction((txn) async {
-          await txn.rawInsert(
-              'INSERT INTO Downloads(imageName, imagePath,thumbnailPath) VALUES(?,?,?)',
-              [
-                imgName,
-                finalDir.path.substring(9) + "/" + imgName,
-                "$appdir/$imgName"
-              ]);
-        });
+        ext.add(taskId);
       } catch (e) {
         print(e);
-        //   f.delete();
       }
     }
   }
