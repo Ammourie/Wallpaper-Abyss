@@ -108,11 +108,11 @@ class LandscapeCard extends StatelessWidget {
       var p = await pp.getExternalStorageDirectories();
 
       String thumbTmp = "";
-      thumbTmp = p[0].parent.path + "/thumbnails";
+      thumbTmp = p[0].parent.path + "/.thumbnails";
       Directory thumbDir = Directory(thumbTmp);
       thumbDir.createSync(recursive: true);
       String tmp = "";
-      tmp = p[0].path;
+      tmp = p[0].parent.path + "/.temp";
       Directory tmpDir = Directory(tmp);
       tmpDir.createSync(recursive: true);
       String thumbName = imgName.split(".")[0];

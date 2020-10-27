@@ -36,12 +36,13 @@ dependencies:
   flutter_downloader: ^1.5.0
   sqflite: ^1.0.0
   open_file: ^2.0.0
-  flutter_cache_manager: ^1.4.2
+  flutter_cache_manager: ^2.0.0
   flutter_launcher_icons: "^0.8.0"
   flutter_tags: "^0.4.9"
   url_launcher: ^5.7.2
   provider: ^4.3.2+2
   shared_preferences: ^0.5.12+2
+  analyzer:
 
 
   

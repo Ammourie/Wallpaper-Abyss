@@ -137,14 +137,14 @@ class ImageDetails extends StatelessWidget {
                               var p = await pp.getExternalStorageDirectories();
 
                               String thumbTmp = "";
-                              thumbTmp = p[0].parent.path + "/thumbnails";
+                              thumbTmp = p[0].parent.path + "/.thumbnails";
                               String tmp = "";
-                              tmp = p[0].path;
+                              tmp = p[0].parent.path + "/.temp";
                               Directory thumbDir = Directory(thumbTmp);
                               thumbDir.createSync(recursive: true);
                               Directory tmpDir = Directory(tmp);
                               tmpDir.createSync(recursive: true);
-                              print(snapshot.data.imageId);
+
                               try {
                                 print(snapshot.data.imageName);
                                 await FlutterDownloader.enqueue(

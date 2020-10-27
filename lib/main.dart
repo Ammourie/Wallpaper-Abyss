@@ -12,7 +12,7 @@ import './notifires/settings_notifire.dart';
 import 'package:provider/provider.dart';
 import 'pages/home.dart';
 import 'package:path_provider/path_provider.dart' as pp;
-// import 'package:workmanager/workmanager.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
         String finalDir;
         var t = await pp.getExternalStorageDirectories();
 
-        String thumbDir = t[0].parent.path + "/thumbnails";
+        String thumbDir = t[0].parent.path + "/.thumbnails";
         if (!storageflag) {
           finalDir = t[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
         } else {
@@ -114,6 +114,9 @@ class _MyAppState extends State<MyApp> {
               ]);
         });
         ext.remove(id);
+
+        DefaultCacheManager manager = new DefaultCacheManager();
+        manager.emptyCache(); //clears all data in cache.
       }
     });
   }
