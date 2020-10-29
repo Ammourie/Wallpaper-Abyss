@@ -8,7 +8,7 @@
 .buildlog/
 .history
 .svn/
-.keys/alphacoders keys.txt
+/Keys/Alphacoders_keys
 
 # IntelliJ related
 *.iml
