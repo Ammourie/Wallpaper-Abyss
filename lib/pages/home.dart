@@ -105,6 +105,9 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0,
+      ),
       backgroundColor: Theme.of(context).canvasColor,
       key: mykey,
       drawer: buildDrawer(context),

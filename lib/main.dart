@@ -82,25 +82,17 @@ class _MyAppState extends State<MyApp> {
         var res = await FlutterDownloader.loadTasksWithRawQuery(
             query: "select * from task where task_id='$id'");
         var task = res[0];
-        SharedPreferences sp = await SharedPreferences.getInstance();
-        bool storageflag = sp.getBool("storageLocation");
+
         String finalDir;
         var t = await pp.getExternalStorageDirectories();
+        var tmpThumbDir = await pp.getExternalStorageDirectories();
+        String thumbDir = "";
+        thumbDir = tmpThumbDir[0].parent.path + "/cache";
 
-        String thumbDir = t[0].parent.path + "/.thumbnails";
-        if (!storageflag) {
-          finalDir = t[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
-        } else {
-          finalDir = t[1].path + '/Wallpaper Abyss';
-        }
+        finalDir = t[0].parent.parent.parent.parent.path + '/Wallpaper Abyss';
+
         print(task.savedDir);
-        File src = File(task.savedDir + "/${task.filename}");
-        src.createSync(recursive: true);
-        File des = File(finalDir + "/${task.filename}");
-        await des.create(recursive: true);
-        var data = await src.readAsBytes();
-        await des.writeAsBytes(data);
-        await src.delete();
+
         var databasesPath = await getDatabasesPath();
         String dbPath = databasesPath + "/test.db";
         var database = await openDatabase(dbPath);
@@ -115,8 +107,8 @@ class _MyAppState extends State<MyApp> {
         });
         ext.remove(id);
 
-        DefaultCacheManager manager = new DefaultCacheManager();
-        manager.emptyCache(); //clears all data in cache.
+        // DefaultCacheManager manager = new DefaultCacheManager();
+        // manager.emptyCache(); //clears all data in cache.
       }
     });
   }

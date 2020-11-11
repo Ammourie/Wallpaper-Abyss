@@ -7,8 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuck/notifires/settings_notifire.dart';
 import 'package:fuck/pages/home.dart';
 import 'package:fuck/pages/image_future.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 import '../mapp.dart';
 import '../models/image_info.dart' as pi;
 import 'package:permission_handler/permission_handler.dart' as ph;
@@ -137,26 +137,27 @@ class ImageDetails extends StatelessWidget {
                               var p = await pp.getExternalStorageDirectories();
 
                               String thumbTmp = "";
-                              thumbTmp = p[0].parent.path + "/.thumbnails";
-                              String tmp = "";
-                              tmp = p[0].parent.path + "/.temp";
-                              Directory thumbDir = Directory(thumbTmp);
-                              thumbDir.createSync(recursive: true);
-                              Directory tmpDir = Directory(tmp);
-                              tmpDir.createSync(recursive: true);
+                              thumbTmp = p[0].parent.path + "/cache";
+
+                              Directory(thumbTmp).createSync(recursive: true);
+                              String downloadDir =
+                                  p[0].parent.parent.parent.parent.path +
+                                      '/Wallpaper Abyss';
+                              Directory(downloadDir)
+                                  .createSync(recursive: true);
 
                               try {
-                                print(snapshot.data.imageName);
-                                await FlutterDownloader.enqueue(
-                                  url: snapshot.data.thumbURL,
-                                  savedDir: thumbDir.path,
-                                  fileName: snapshot.data.imageId,
-                                  showNotification: false,
-                                  openFileFromNotification: false,
-                                );
+                                var response =
+                                    await get(snapshot.data.thumbURL);
+
+                                File file = new File(
+                                    thumbTmp + '/${snapshot.data.imageId}');
+
+                                file.writeAsBytesSync(response.bodyBytes);
+
                                 String taskId = await FlutterDownloader.enqueue(
                                   url: snapshot.data.imgURL,
-                                  savedDir: tmpDir.path.toString(),
+                                  savedDir: downloadDir,
                                   fileName: snapshot.data.imageId +
                                       "." +
                                       snapshot.data.imgType,

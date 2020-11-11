@@ -40,10 +40,16 @@ class DownloadsPage extends StatelessWidget {
                     return Dismissible(
                       key: Key(index.toString()),
                       onDismissed: (direction) async {
-                        File f = File(
-                            "/storage/" + downloadedImages[index]["imagePath"]);
+                        File f = File("/storage/" +
+                            downloadedImages[downloadedImages.length -
+                                1 -
+                                index]["imagePath"]);
+                        File f2 = File(downloadedImages[
+                                downloadedImages.length - 1 - index]
+                            ["thumbnailPath"]);
 
-                        f.delete();
+                        await f.delete();
+                        await f2.delete();
                         var tmpDir = (await pp.getTemporaryDirectory()).path;
                         new Directory(tmpDir).delete(recursive: true);
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../notifires/settings_notifire.dart';
 import 'package:provider/provider.dart';
+
+import '../notifires/settings_notifire.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -55,32 +55,21 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  "Download Storage:",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                ),
-                Consumer<SettingsNotifire>(builder: (ctx, notifire, _) {
-                  return DropdownButton(
-                    items: [
-                      DropdownMenuItem(
-                        child: Text("Internal Storage"),
-                        value: false,
-                      ),
-                      DropdownMenuItem(
-                        child: Text("External Storage"),
-                        value: true,
-                      )
-                    ],
-                    onChanged: (value) {
-                      notifire.setStorage(value);
-                    },
-                    value: notifire.storageLocation,
-                  );
-                }),
-              ],
+            SizedBox(
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Download Storage:",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                  Text(
+                    "Internal Storage",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+                  ),
+                ],
+              ),
             ),
             Divider(),
           ],

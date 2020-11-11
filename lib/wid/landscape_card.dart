@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:fuck/mapp.dart';
 import 'package:fuck/notifires/settings_notifire.dart';
 import 'package:fuck/pages/image.dart';
+import 'package:http/http.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
@@ -72,15 +74,11 @@ class LandscapeCard extends StatelessWidget {
                     imgName,
                     style: TextStyle(fontSize: 17),
                   ),
-                  Consumer<SettingsNotifire>(
-                    builder: (ctx, notifire, _) {
-                      var storageLocation = notifire.storageLocation;
-                      return IconButton(
-                        iconSize: 30,
-                        icon: Icon(Icons.file_download),
-                        onPressed: () =>
-                            downloadImage(storageLocation, context),
-                      );
+                  IconButton(
+                    iconSize: 30,
+                    icon: Icon(Icons.file_download),
+                    onPressed: () async {
+                      return downloadImage(context);
                     },
                   ),
                 ],
@@ -92,7 +90,7 @@ class LandscapeCard extends StatelessWidget {
     );
   }
 
-  void downloadImage(bool storageLocation, BuildContext context) async {
+  void downloadImage(BuildContext context) async {
     if (!(await ph.Permission.storage.isGranted)) {
       ph.Permission.storage.request();
     } else {
@@ -106,28 +104,26 @@ class LandscapeCard extends StatelessWidget {
         fontSize: 14.0,
       );
       var p = await pp.getExternalStorageDirectories();
-
+      var tmpThumbDir = await pp.getExternalStorageDirectories();
       String thumbTmp = "";
-      thumbTmp = p[0].parent.path + "/.thumbnails";
-      Directory thumbDir = Directory(thumbTmp);
-      thumbDir.createSync(recursive: true);
-      String tmp = "";
-      tmp = p[0].parent.path + "/.temp";
-      Directory tmpDir = Directory(tmp);
-      tmpDir.createSync(recursive: true);
-      String thumbName = imgName.split(".")[0];
+      thumbTmp = tmpThumbDir[0].parent.path + "/cache";
+      print(thumbTmp);
+      String downloadDir =
+          p[0].parent.parent.parent.parent.path + "/Wallpaper Abyss";
+      Directory(downloadDir).createSync(recursive: true);
+      Directory(thumbTmp).createSync(recursive: true);
 
+      String thumbName = imgName.split(".")[0];
       try {
-        await FlutterDownloader.enqueue(
-          url: imgURL,
-          savedDir: thumbDir.path,
-          fileName: thumbName,
-          showNotification: false,
-          openFileFromNotification: false,
-        );
+        var response = await get(imgURL);
+
+        File file = new File(thumbTmp + '/$thumbName');
+
+        file.writeAsBytesSync(response.bodyBytes);
+
         String taskId = await FlutterDownloader.enqueue(
           url: img,
-          savedDir: tmpDir.path,
+          savedDir: downloadDir,
           fileName: imgName,
           showNotification: true,
           openFileFromNotification: true,

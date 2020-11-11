@@ -18,39 +18,25 @@ class SettingsNotifire extends ChangeNotifier {
     scaffoldBackgroundColor: Colors.white,
   );
 
-  bool _flag = false;
-  bool _storageLocation = false;
+  bool _themeFlag = false;
 
   SharedPreferences _flagStorage;
   void init() async {
     _flagStorage = await SharedPreferences.getInstance();
     if (_flagStorage.containsKey("flag")) {
-      _flag = _flagStorage.getBool("flag");
+      _themeFlag = _flagStorage.getBool("flag");
     } else {
       _flagStorage.setBool("flag", false);
     }
-    if (_flagStorage.containsKey("storageLocation")) {
-      _storageLocation = _flagStorage.getBool("storageLocation");
-    } else {
-      _flagStorage.setBool("storageLocation", false);
-    }
     notifyListeners();
   }
 
-  bool get flag => _flag;
-  bool get storageLocation => _storageLocation;
-  void setStorage(bool storage) {
-    _storageLocation = storage;
-    _flagStorage.setBool("storageLocation", storage);
-
-    // print(_storageLocation);
-    notifyListeners();
-  }
+  bool get flag => _themeFlag;
 
   void toggleTheme() {
-    _flag = !_flag;
+    _themeFlag = !_themeFlag;
 
-    _flagStorage.setBool("flag", _flag);
+    _flagStorage.setBool("flag", _themeFlag);
     notifyListeners();
   }
 }
