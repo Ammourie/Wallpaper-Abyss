@@ -1,6 +1,6 @@
 # Alphacoders
 
-A new Flutter project.
+An app to download high resolution pics from  "https://wall.alphacoders.com" .
 
 ## Getting Started
 
